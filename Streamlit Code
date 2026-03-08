@@ -1,0 +1,119 @@
+import streamlit as st
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Title
+st.title("Customer Churn Analytics Dashboard")
+
+# Load dataset
+df = pd.read_csv("/users/ashutoshgoel/python/European_Bank.csv")
+
+# -------------------------
+# Sidebar Filters
+# -------------------------
+st.sidebar.header("Filters")
+
+country = st.sidebar.multiselect(
+    "Select Country",
+    df["Geography"].unique(),
+    default=df["Geography"].unique()
+)
+
+gender = st.sidebar.multiselect(
+    "Select Gender",
+    df["Gender"].unique(),
+    default=df["Gender"].unique()
+)
+
+df = df[(df["Geography"].isin(country)) & (df["Gender"].isin(gender))]
+
+# -------------------------
+# KPI Metrics
+# -------------------------
+
+total_customers = len(df)
+churn_rate = df["Exited"].mean() * 100
+avg_balance = df["Balance"].mean()
+avg_age = df["Age"].mean()
+
+col1, col2, col3, col4 = st.columns(4)
+
+col1.metric("Total Customers", total_customers)
+col2.metric("Churn Rate (%)", round(churn_rate,2))
+col3.metric("Average Balance", round(avg_balance,2))
+col4.metric("Average Age", round(avg_age,1))
+
+# -------------------------
+# Churn Distribution
+# -------------------------
+
+st.subheader("Churn Distribution")
+
+fig1, ax1 = plt.subplots()
+
+sns.countplot(x="Exited", data=df, ax=ax1)
+
+st.pyplot(fig1)
+
+# -------------------------
+# Churn by Country
+# -------------------------
+
+st.subheader("Churn Rate by Country")
+
+geo_churn = df.groupby("Geography")["Exited"].mean()
+
+fig2, ax2 = plt.subplots()
+
+geo_churn.plot(kind="bar", ax=ax2)
+
+st.pyplot(fig2)
+
+# -------------------------
+# Age vs Churn
+# -------------------------
+
+st.subheader("Age vs Churn")
+
+fig3, ax3 = plt.subplots()
+
+sns.boxplot(x="Exited", y="Age", data=df, ax=ax3)
+
+st.pyplot(fig3)
+
+# -------------------------
+# Products vs Churn
+# -------------------------
+
+st.subheader("Products vs Churn")
+
+fig4, ax4 = plt.subplots()
+
+sns.barplot(x="NumOfProducts", y="Exited", data=df, ax=ax4)
+
+st.pyplot(fig4)
+
+# -------------------------
+# Activity vs Churn
+# -------------------------
+
+st.subheader("Customer Activity vs Churn")
+
+fig5, ax5 = plt.subplots()
+
+sns.barplot(x="IsActiveMember", y="Exited", data=df, ax=ax5)
+
+st.pyplot(fig5)
+
+# -------------------------
+# High Value Customers
+# -------------------------
+
+st.subheader("High Value Customers Explorer")
+
+balance_filter = st.slider("Minimum Balance", 0, 200000)
+
+filtered = df[df["Balance"] >= balance_filter]
+
+st.write(filtered.head(20))
