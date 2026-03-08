@@ -1,0 +1,64 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv("users/ashutoshgoel/python/European_Bank.csv")
+
+
+df.shape
+df.info()
+df.describe()
+df.drop(["CustomerId","Surname","Year"], axis=1, inplace=True)
+df['Gender'] = df['Gender'].map({'Male':1,'Female':0})
+df = pd.get_dummies(df, columns=['Geography'], drop_first=True)
+df.isnull().sum()
+
+#EDA-
+#overall churn rate
+churn_rate = df['Exited'].mean()
+print(churn_rate)
+
+#churn distribution
+sns.countplot(x="Exited", data=df)
+plt.title("Customer Churn Distribution")
+plt.show()
+
+#churn VS geography
+geo_churn = df.groupby("Geography_Germany")["Exited"].mean()
+print(geo_churn)
+sns.barplot(x="Geography_Germany", y="Exited", data=df)
+plt.title("Churn by Country")
+plt.show()
+
+#age vs churn
+sns.boxplot(x="Exited", y="Age", data=df)
+plt.title("Age vs Churn")
+plt.show()
+
+df['AgeGroup'] = pd.cut(df['Age'],
+bins=[0,30,45,60,100],
+labels=['<30','30-45','46-60','60+'])
+
+df.groupby("AgeGroup")["Exited"].mean()
+
+#products usage vs churn
+sns.barplot(x="NumOfProducts", y="Exited", data=df)
+plt.title("Products vs Churn")
+plt.show()
+
+#activity vs churn
+sns.barplot(x="IsActiveMember", y="Exited", data=df)
+plt.title("Activity vs Churn")
+plt.show()
+
+#balance vs churn
+sns.boxplot(x="Exited", y="Balance", data=df)
+plt.title("Balance vs Churn")
+plt.show()
+
+#High Value Customer Analysis
+high_value = df[df["Balance"] > 100000]
+
+high_value["Exited"].mean()
+
