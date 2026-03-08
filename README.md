@@ -165,19 +165,6 @@ streamlit run app.py
 
 ---
 
-## Project Structure
-
-Bank-Churn-Analytics
-│
-├── European_Bank.csv
-├── app.py
-├── research_paper.pdf
-├── executive_summary.pdf
-├── requirements.txt
-└── README.md
-
----
-
 ## Future Improvements
 
 Potential enhancements include:
